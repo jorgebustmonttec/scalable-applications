@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 clear
+clear
 echo "Building images…"
 docker compose build            # uses cache → a few seconds
 
