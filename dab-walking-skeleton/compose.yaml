@@ -3,6 +3,35 @@ services:
     build: server
     restart: unless-stopped
     volumes:
-      - ./server:/app
+      - ./server:/app                    # live code for server
     ports:
-      - 8000:8000
+      - "8000:8000"
+
+  client:
+    build: client
+    restart: unless-stopped
+    # ---- bind-mount only source & config ----
+    volumes:
+      - ./client/src:/app/src            # pages, layouts, etc.
+      - ./client/public:/app/public      # static assets
+      - ./client/astro.config.mjs:/app/astro.config.mjs:ro
+      # ---- container-only volumes for deps ----
+      - client_node_modules:/app/node_modules
+      - client_deno_dir:/app/.deno
+    ports:
+      - "4321:4321"
+    depends_on:
+      - server
+
+  k6-tests:
+    entrypoint: "/bin/true"          # idle until invoked
+    build: k6-tests
+    volumes:
+      - ./k6-tests/tests:/tests      # live-edit test scripts
+    depends_on:
+      - client
+
+
+volumes:
+  client_node_modules:
+  client_deno_dir:

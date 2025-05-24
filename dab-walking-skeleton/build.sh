@@ -1,14 +1,11 @@
+#!/usr/bin/env bash
 clear
-clear
-echo "Building the project..."
-echo "Cleaning up old build files..."
-rm -rf node_modules .deno .vite .cache package-lock.json deno.lock
-#cd client
-#rm -rf node_modules .deno .vite .cache package-lock.json deno.lock
-#cd ..
-cd server
-rm -rf node_modules .deno .vite .cache package-lock.json deno.lock
-cd ..
-echo "Building the client..."
+echo "Building images…"
+docker compose build            # uses cache → a few seconds
+
+echo "Populating dependency volumes (only if empty)…"
+docker compose run --rm client deno install --allow-scripts
+
+echo "Starting stack…"
 docker compose down
-docker compose up --build
+docker compose up --remove-orphans
