@@ -3,4 +3,4 @@ CREATE TABLE users (
   name TEXT NOT NULL
 );
 
-INSERT INTO users (name) SELECT 'User ' || (n)::text FROM generate_series(1, 100000) n;
+INSERT INTO users (name) SELECT 'User ' || (n)::text FROM generate_series(1, 1000) n;

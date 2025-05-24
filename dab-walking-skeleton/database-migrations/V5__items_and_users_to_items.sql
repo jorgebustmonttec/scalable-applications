@@ -8,7 +8,7 @@ CREATE TABLE users_to_items (
   item_id INTEGER NOT NULL REFERENCES items(id)
 );
 
-INSERT INTO items (name) SELECT 'Item ' || (n)::text FROM generate_series(1, 1000) n;
+INSERT INTO items (name) SELECT 'Item ' || (n)::text FROM generate_series(1, 100) n;
 
 WITH random_items AS (
   SELECT
