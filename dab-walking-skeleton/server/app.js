@@ -24,41 +24,33 @@ const sql = postgres();
 app.use("/*", cors());
 app.use("/*", logger());
 
-
 // ========================= ROUTES =========================
 
 // ------------------------- GET /api/languages -------------------------
 app.get(
   "/api/languages",
-  cache({
-    cacheName: "languages-cache",   // different cache name per endpoint
-    wait: true
-  }),
+  cache({ cacheName: "languages-cache", wait: true }),
+  async (c) => {
+    const languages =
+      await sql`SELECT id, name FROM languages ORDER BY id`;
+    return c.json(languages);
+  },
 );
-
-app.get("/api/languages", async (c) => {
-  const languages =
-    await sql`SELECT id, name FROM languages ORDER BY id`;
-  return c.json(languages);
-});
 
 // ------------------------- GET /api/languages/:id/exercises -------------------------
 app.get(
-  "/api/languages/*",
-  cache({
-    cacheName: "exercises-cache",
-    wait: true
-  }),
+  "/api/languages/:id/exercises",
+  cache({ cacheName: "exercises-cache", wait: true }),
+  async (c) => {
+    const id = c.req.param("id");
+    const exercises =
+      await sql`SELECT id, title, description
+                FROM exercises
+                WHERE language_id = ${id}
+                ORDER BY id`;
+    return c.json(exercises);
+  },
 );
 
-app.get("/api/languages/:id/exercises", async (c) => {
-  const id = c.req.param("id");
-  const exercises =
-    await sql`SELECT id, title, description
-              FROM exercises
-              WHERE language_id = ${id}
-              ORDER BY id`;
-  return c.json(exercises);
-});
 
 export default app;
