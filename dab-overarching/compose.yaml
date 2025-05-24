@@ -1,0 +1,68 @@
+services:
+  server:
+    build: server
+    restart: unless-stopped
+    volumes:
+      - ./server:/app
+    ports:
+      - 8000:8000
+    env_file:
+      - project.env
+    depends_on:
+      - database
+
+  client:
+    build: client
+    restart: unless-stopped
+    # ---- bind-mount only source & config ----
+    volumes:
+      - ./client/src:/app/src            # pages, layouts, etc.
+      - ./client/public:/app/public      # static assets
+      - ./client/astro.config.mjs:/app/astro.config.mjs:ro
+      # ---- container-only volumes for deps ----
+      - client_node_modules:/app/node_modules
+      - client_deno_dir:/app/.deno
+    ports:
+      - "4321:4321"
+    depends_on:
+      - server
+
+  k6-tests:
+    entrypoint: "/bin/true"          # idle until invoked
+    build: k6-tests
+    volumes:
+      - ./k6-tests/tests:/tests      # live-edit test scripts
+    depends_on:
+      - client
+  
+  database:
+    container_name: postgresql_database
+    image: postgres:17.0
+    restart: unless-stopped
+    env_file:
+      - project.env
+    command: >
+      postgres
+      -c shared_preload_libraries=auto_explain,pg_stat_statements
+      -c auto_explain.log_min_duration=10
+
+  database-migrations:
+    image: flyway/flyway:10
+    env_file:
+      - project.env
+    depends_on:
+      - database
+    volumes:
+      - ./database-migrations:/flyway/sql
+    command: -connectRetries=60 -baselineOnMigrate=true migrate
+
+  redis:
+    image: redis:7.4.2
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+
+
+volumes:
+  client_node_modules:
+  client_deno_dir:

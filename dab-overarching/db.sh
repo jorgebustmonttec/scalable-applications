@@ -1,0 +1,1 @@
+docker exec -it postgresql_database psql -U username database
