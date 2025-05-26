@@ -44,26 +44,32 @@ const redisCacheMiddleware = async (c, next) => {
   await redis.set(c.req.url, JSON.stringify(res));
 };
 
+const REPLICA_ID = crypto.randomUUID();
+
 // ------------------------- Middleware -------------------------
 app.use("/*", cors());
 app.use("/*", logger());
+app.use("*", async (c, next) => {
+  c.res.headers.set("X-Replica-Id", REPLICA_ID);
+  await next();
+});
 
 
 // ========================= ROUTES =========================
 
 // ------------------------- Health Check -------------------------
-app.get(
+/*app.get(
   "/",
   cache({
     cacheName: "hello-cache",
     wait: true,
   }),
-);
+);*/
 
 app.get(
   "/",
-  async (c) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  /*async*/ (c) => {
+    //await new Promise((resolve) => setTimeout(resolve, 1000));
     return c.json({ message: "Hello world!" });
   },
 );
