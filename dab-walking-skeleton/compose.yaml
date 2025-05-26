@@ -36,7 +36,7 @@ services:
       - client
   
   database:
-    container_name: postgresql_database
+    container_name: walking-skeleton-database
     image: postgres:17.0
     restart: unless-stopped
     env_file:
