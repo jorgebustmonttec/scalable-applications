@@ -67,6 +67,16 @@ services:
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
 
+  traefik:
+    image: traefik:v3.3
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
 
 volumes:
   client_node_modules:
