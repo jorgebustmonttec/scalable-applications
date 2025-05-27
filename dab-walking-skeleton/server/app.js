@@ -234,4 +234,10 @@ app.get("/hybrid", async (c) => {
   </html>`);
 });
 
+// ========================= API =========================
+
+app.get("/api", (c) => {
+  return c.text("Hello new path!");
+});
+
 export default app;

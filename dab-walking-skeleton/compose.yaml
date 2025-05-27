@@ -3,19 +3,13 @@ services:
   client:
     build: client
     restart: unless-stopped
-    # ---- bind-mount only source & config ----
     volumes:
-      - ./client/src:/app/src            # pages, layouts, etc.
-      - ./client/public:/app/public      # static assets
-      - ./client/astro.config.mjs:/app/astro.config.mjs:ro
-      # ---- container-only volumes for deps ----
-      - client_node_modules:/app/node_modules
-      - client_deno_dir:/app/.deno
-    ports:
-      - "4321:4321"
-    depends_on:
-      - server
-
+      - ./client:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.client-router.entrypoints=web"
+      - "traefik.http.routers.client-router.rule=PathPrefix(`/`)"
+      - "traefik.http.services.client-service.loadbalancer.server.port=4321"
   k6-tests:
     entrypoint: "/bin/true"          # idle until invoked
     build: k6-tests
@@ -71,12 +65,11 @@ services:
       - project.env
     depends_on:
       - database
-    deploy:
-      replicas: 1
+      - redis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server-router.entrypoints=web"
-      - "traefik.http.routers.server-router.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.server-router.rule=PathPrefix(`/api`)"
       - "traefik.http.services.server-service.loadbalancer.server.port=8000"
   consumer-server:
     build: consumer-server
