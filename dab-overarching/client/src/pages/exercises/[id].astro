@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+import Layout from "../../layouts/Layout.astro";
+import Exercise from "../../components/Exercise.svelte";
+const { id } = Astro.params;
+---
+
+<Layout>
+  <p>Exercise {id}</p>
+  <Exercise id={id} client:idle/>
+</Layout>
