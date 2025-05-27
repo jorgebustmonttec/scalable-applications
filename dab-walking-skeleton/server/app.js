@@ -69,6 +69,17 @@ const redisCacheMiddleware = async (c, next) => {
   await redis.set(c.req.url, JSON.stringify(res));
 };
 
+// ------------------------- Items -------------------------
+
+const getItems = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  const items = Array.from(
+    { length: 1000 },
+    (_, i) => ({ id: i, name: `Item ${i}` }),
+  );
+  return items;
+};
+
 // ------------------------- Middleware -------------------------
 app.use("/*", cors());
 app.use("/*", logger());
@@ -148,6 +159,23 @@ app.post("/users", async (c) => {
   c.status(202);
   return c.body("Accepted");
 });
+
+// ------------------------- SSR -------------------------
+
+app.get("/ssr", async (c) => {
+  const items = await getItems();
+
+  return c.html(`<html>
+    <head>
+    </head>
+    <body>
+      <ul>
+        ${items.map((item) => `<li>${item.name}</li>`).join("")}
+      </ul>
+    </body>
+  </html>`);
+});
+
 
 // ------------------------- items -------------------------
 app.get("/items", async (c) => {
