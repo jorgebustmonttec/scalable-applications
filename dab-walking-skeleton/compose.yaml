@@ -4,17 +4,19 @@ services:
     restart: unless-stopped
     volumes:
       - ./server:/app
-    ports:
-      - 8000-8001:8000
     env_file:
       - project.env
     depends_on:
       - database
+    ports:
+      - 8000-8001:8000
     deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '0.5'
+      replicas: 2
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server-router.entrypoints=web"
+      - "traefik.http.routers.server-router.rule=PathPrefix(`/`)"
+      - "traefik.http.services.server-service.loadbalancer.server.port=8000"
 
   client:
     build: client
@@ -66,14 +68,15 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
-
   traefik:
     image: traefik:v3.3
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
+      - "--entrypoints.web.address=:12345"
     ports:
       - "8080:8080"
+      - "12345:12345"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
