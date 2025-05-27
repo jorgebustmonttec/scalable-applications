@@ -8,8 +8,6 @@ services:
       - project.env
     depends_on:
       - database
-    ports:
-      - 8000-8001:8000
     deploy:
       replicas: 2
     labels:
@@ -73,10 +71,10 @@ services:
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:12345"
+      - "--entrypoints.web.address=:8000"
     ports:
       - "8080:8080"
-      - "12345:12345"
+      - "8000:8000"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
