@@ -7,7 +7,7 @@ export const options = {
 };
 
 export default () => {
-  const url = "http://server:8000/";
+  const url = "http://traefik:8000/";
   const res = http.get(url);
 
   check(res, {

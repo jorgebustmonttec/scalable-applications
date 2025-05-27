@@ -1,20 +1,4 @@
 services:
-  server:
-    build: server
-    restart: unless-stopped
-    volumes:
-      - ./server:/app
-    env_file:
-      - project.env
-    depends_on:
-      - database
-    deploy:
-      replicas: 2
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.server-router.entrypoints=web"
-      - "traefik.http.routers.server-router.rule=PathPrefix(`/`)"
-      - "traefik.http.services.server-service.loadbalancer.server.port=8000"
 
   client:
     build: client
@@ -78,7 +62,22 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
-
+  server:
+    build: server
+    restart: unless-stopped
+    volumes:
+      - ./server:/app
+    env_file:
+      - project.env
+    depends_on:
+      - database
+    deploy:
+      replicas: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server-router.entrypoints=web"
+      - "traefik.http.routers.server-router.rule=PathPrefix(`/`)"
+      - "traefik.http.services.server-service.loadbalancer.server.port=8000"
 volumes:
   client_node_modules:
   client_deno_dir:

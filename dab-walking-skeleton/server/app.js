@@ -118,4 +118,14 @@ app.get("/todos", async (c) => {
   return c.json(todos);
 });
 
+// ------------------------- Users -------------------------
+
+app.post("/users", async (c) => {
+  const { name } = await c.req.json();
+  const user = await sql`INSERT INTO users (name) VALUES (${name})`;
+  c.status(202);
+  return c.body("Accepted");
+});
+
+
 export default app;

@@ -1,1 +1,1 @@
-docker exec -it postgresql_database psql -U username database
+docker exec -it walking-skeleton-database psql -U username database
