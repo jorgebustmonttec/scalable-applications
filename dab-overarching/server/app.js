@@ -9,6 +9,9 @@ import { cache } from "@hono/hono/cache";
 // ------------------------- Postgres -------------------------
 import postgres from "postgres";
 
+// ------------------------- Redis -------------------------
+import { Redis } from "ioredis";
+
 // ========================= CONFIG =========================
 
 // ------------------------- Environment Variables -------------------------
@@ -19,6 +22,17 @@ import postgres from "postgres";
 */
 const app = new Hono();
 const sql = postgres();
+
+// ------------------------- Redis -------------------------
+let redis;
+if (Deno.env.get("REDIS_HOST")) {
+  redis = new Redis(
+    Number.parseInt(Deno.env.get("REDIS_PORT")),
+    Deno.env.get("REDIS_HOST")
+  );
+} else {
+  redis = new Redis(6379, "redis");
+}
 
 // ------------------------- Middleware -------------------------
 app.use("/*", cors());
@@ -45,6 +59,28 @@ app.get(
   },
 );
 
+
+// ------------------------- POST /api/exercises/:id/submissions -------------------------
+app.post("/api/exercises/:id/submissions", async (c) => {
+  const id = c.req.param("id");
+  const { source_code } = await c.req.json();
+
+  // Save to DB
+  const result = await sql`
+    INSERT INTO exercise_submissions (exercise_id, source_code)
+    VALUES (${id}, ${source_code})
+    RETURNING id
+  `;
+  const submissionId = result[0].id;
+
+  // Add to Redis queue
+  await redis.lpush("submissions", submissionId.toString());
+
+  // Return submission ID
+  return c.json({ id: submissionId });
+});
+
+
 // ------------------------- GET /api/languages -------------------------
 app.get(
   "/api/languages",
@@ -69,6 +105,7 @@ app.get(
   }),
 );
 
+
 app.get("/api/languages/:id/exercises", async (c) => {
   const id = c.req.param("id");
   const exercises =
@@ -78,5 +115,6 @@ app.get("/api/languages/:id/exercises", async (c) => {
               ORDER BY id`;
   return c.json(exercises);
 });
+
 
 export default app;
