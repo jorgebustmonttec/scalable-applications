@@ -78,6 +78,17 @@ services:
       - "traefik.http.routers.server-router.entrypoints=web"
       - "traefik.http.routers.server-router.rule=PathPrefix(`/`)"
       - "traefik.http.services.server-service.loadbalancer.server.port=8000"
+  consumer-server:
+    build: consumer-server
+    restart: unless-stopped
+    volumes:
+      - ./consumer-server:/app
+    env_file:
+      - project.env
+    depends_on:
+      - redis
+      - database
+
 volumes:
   client_node_modules:
   client_deno_dir:

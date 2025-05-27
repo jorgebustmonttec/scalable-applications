@@ -22,12 +22,12 @@ const sql = postgres();
 
 // ------------------------- Redis -------------------------
 const redis = new Redis(6379, "redis");
-const redisConsumer = new Redis(6379, "redis");
+/*const redisConsumer = new Redis(6379, "redis");*/
 const redisProducer = new Redis(6379, "redis");
 
 const QUEUE_NAME = "users";
 
-const consume = async () => {
+/*const consume = async () => {
   while (true) {
     const result = await redisConsumer.brpop(QUEUE_NAME, 0);
     if (result) {
@@ -38,7 +38,7 @@ const consume = async () => {
   }
 };
 
-consume();
+consume();*/
 
 // ------------------------- Replica ID -------------------------
 const REPLICA_ID = crypto.randomUUID();
