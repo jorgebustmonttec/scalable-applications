@@ -1,24 +1,27 @@
-import http from "k6/http";
-import { check } from "k6";
+import { browser } from "k6/browser";
 
 export const options = {
-  vus: 5,
-  duration: "10s",
+  scenarios: {
+    client: {
+      vus: 5,
+      duration: "30s",
+      executor: "constant-vus",
+      options: {
+        browser: {
+          type: "chromium",
+        },
+      },
+    },
+  },
 };
 
 export default async () => {
-  const user = {
-    name: `User ${Math.random()}`,
-  };
+  const page = await browser.newPage();
+  await page.goto("http://localhost:8000/public/csr.html");
 
-  const url = "http://traefik:8000/users";
-  const res = http.post(url, JSON.stringify(user), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  check(res, {
-    "status is 202": (r) => r.status === 202,
-  });
+  try {
+    await page.locator(`//li[text()="Item 999"]`).isVisible();
+  } finally {
+    await page.close();
+  }
 };

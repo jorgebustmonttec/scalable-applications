@@ -5,6 +5,7 @@ import { Hono } from "@hono/hono";
 import { cors } from "@hono/hono/cors";
 import { logger } from "@hono/hono/logger";
 import { cache } from "@hono/hono/cache";
+import { serveStatic } from "@hono/hono/deno";
 
 // ------------------------- Postgres -------------------------
 import postgres from "postgres";
@@ -75,6 +76,7 @@ app.use("*", async (c, next) => {
   c.res.headers.set("X-Replica-Id", REPLICA_ID);
   await next();
 });
+app.use("/public/*", serveStatic({ root: "." }));
 
 // ========================= ROUTES =========================
 
@@ -145,6 +147,12 @@ app.post("/users", async (c) => {
   await redisProducer.lpush(QUEUE_NAME, JSON.stringify({ name }));
   c.status(202);
   return c.body("Accepted");
+});
+
+// ------------------------- items -------------------------
+app.get("/items", async (c) => {
+  const items = await getItems();
+  return c.json(items);
 });
 
 export default app;
