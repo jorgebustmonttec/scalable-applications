@@ -62,6 +62,17 @@ services:
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
 
+  grader:
+    build: grader
+    restart: unless-stopped
+    volumes:
+      - ./grader:/app
+    env_file:
+      - project.env
+    depends_on:
+      - redis
+      - database
+
 
 volumes:
   client_node_modules:
