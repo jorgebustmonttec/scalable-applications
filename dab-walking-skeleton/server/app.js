@@ -1,5 +1,4 @@
 // ========================= IMPORTS =========================
-
 // ------------------------- Hono -------------------------
 import { Hono } from "@hono/hono";
 import { cors } from "@hono/hono/cors";
@@ -95,19 +94,6 @@ const getRemainingItems = async () => {
   );
 };
 
-const loadRemaining = async () => {
-  const list = document.getElementById("list");
-  const items = await fetch("http://localhost:8000/items/remaining");
-  const json = await items.json();
-
-  document.getElementById("last")?.remove();
-
-  for (const item of json) {
-    const li = document.createElement("li");
-    li.textContent = item.name;
-    list.appendChild(li);
-  }
-};
 
 // ------------------------- Middleware -------------------------
 app.use("/*", cors());
@@ -218,21 +204,24 @@ app.get("/items/remaining", async (c) => {
   return c.json(items);
 });
 
+
 app.get("/hybrid", async (c) => {
   const items = await getInitialItems();
 
   return c.html(`<html>
     <head>
       <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-          const list = document.getElementById("list");
-          const items = await fetch("http://localhost:8000/items/remaining");
-          const json = await items.json();
-          for (const item of json) {
-            const li = document.createElement("li");
-            li.textContent = item.name;
-            list.appendChild(li);
-          }
+        document.addEventListener("DOMContentLoaded", () => {
+          const observer = new IntersectionObserver((entries, obs) => {
+            if (entries[0].isIntersecting) {
+              import("/public/loadRemaining.js").then((module) => {
+                module.loadRemaining();
+              });
+              obs.disconnect();
+            }
+          });
+
+          observer.observe(document.getElementById('last'));
         });
       </script>
     </head>
