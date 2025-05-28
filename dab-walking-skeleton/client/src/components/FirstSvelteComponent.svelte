@@ -1,5 +1,8 @@
 <script>
-  let count = $state(0);
+  import { useCountState } from "../states/countState.svelte.js";
+  const countState = useCountState();
 </script>
 
-<button onclick={() => count++}>Count {count}!</button>
+<button onclick={() => countState.increment()}>
+  Count {countState.count ?? "◌"}!
+</button>
