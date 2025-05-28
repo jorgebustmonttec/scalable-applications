@@ -41,7 +41,10 @@ app.use("/*", logger());
 
 // ========================= ROUTES =========================
 
-// ------------------------- Health Check -------------------------
+// =====---------------===== Health Check =====---------------=====
+
+// ---------- GET / ----------
+// This is the root endpoint, which serves as a health check.
 
 app.get(
   "/",
@@ -59,8 +62,32 @@ app.get(
   },
 );
 
+// =====---------------===== Exercises =====---------------=====
+// This section handles exercise-related endpoints, including listing exercises,
 
-// ------------------------- POST /api/exercises/:id/submissions -------------------------
+// ---------- GET /api/exercises/:id ----------
+// This endpoint retrieves a specific exercise by its ID.
+
+app.get("/api/exercises/:id", async (c) => {
+  const id = c.req.param("id");
+
+  const result = await sql`
+    SELECT id, title, description
+    FROM exercises
+    WHERE id = ${id}
+  `;
+
+  if (result.length === 0) {
+    return c.notFound();
+  }
+
+  return c.json(result[0]);
+});
+
+
+// ---------- GET /api/exercises/:id/submissions ----------
+// This endpoint retrieves all submissions for a specific exercise by its ID.
+
 app.post("/api/exercises/:id/submissions", async (c) => {
   const id = c.req.param("id");
   const { source_code } = await c.req.json();
@@ -80,8 +107,32 @@ app.post("/api/exercises/:id/submissions", async (c) => {
   return c.json({ id: submissionId });
 });
 
+// ---------- GET /api/exercises/:id ------------
+// This endpoint retrieves all submissions for a specific exercise by its ID.
+app.get("/api/exercises/:id", async (c) => {
+  const id = c.req.param("id");
 
-// ------------------------- GET /api/languages -------------------------
+  const result = await sql`
+    SELECT id, title, description
+    FROM exercises
+    WHERE id = ${id}
+  `;
+
+  if (result.length === 0) {
+    return c.notFound();
+  }
+
+  return c.json(result[0]);
+});
+
+
+
+// =====---------------===== Languages =====---------------=====
+// This section handles language-related endpoints, including listing languages
+
+// ---------- GET /api/languages ----------
+// This endpoint retrieves all programming languages available in the system.
+
 app.get(
   "/api/languages",
   cache({
@@ -96,7 +147,10 @@ app.get("/api/languages", async (c) => {
   return c.json(languages);
 });
 
-// ------------------------- GET /api/languages/:id/exercises -------------------------
+
+// ---------- GET /api/languages/* ----------
+// This endpoint retrieves a specific programming language by its ID.
+
 app.get(
   "/api/languages/*",
   cache({
@@ -105,6 +159,8 @@ app.get(
   }),
 );
 
+// ---------- GET /api/languages/:id/exercises ----------
+// This endpoint retrieves all exercises for a specific programming language by its ID.
 
 app.get("/api/languages/:id/exercises", async (c) => {
   const id = c.req.param("id");
@@ -116,5 +172,29 @@ app.get("/api/languages/:id/exercises", async (c) => {
   return c.json(exercises);
 });
 
+// =====---------------===== Submissions =====---------------=====
+
+// ---------- GET /api/submissions/:id/status ----------
+// This endpoint retrieves the status of a specific submission by its ID.
+
+app.get("/api/submissions/:id/status", async (c) => {
+  const id = c.req.param("id");
+
+  const result = await sql`
+    SELECT grading_status, grade
+    FROM exercise_submissions
+    WHERE id = ${id}
+  `;
+
+  if (result.length === 0) {
+    return c.notFound();
+  }
+
+  return c.json(result[0]);
+});
+
+
+
+// ========================= EXPORTS =========================
 
 export default app;
