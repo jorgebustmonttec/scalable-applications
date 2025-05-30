@@ -89,7 +89,7 @@ services:
       - "traefik.http.routers.grader-api.rule=PathPrefix(`/grader-api`)"
       - "traefik.http.routers.grader-api.middlewares=grader-api-replacepath"
       - "traefik.http.middlewares.grader-api-replacepath.replacePathRegex.regex=^/grader-api(.*)"
-      - "traefik.http.middlewares.grader-api-replacepath.replacePathRegex.replacement=/api$1"
+      - "traefik.http.middlewares.grader-api-replacepath.replacePathRegex.replacement=/grader-api$1"
       - "traefik.http.services.grader-api.loadbalancer.server.port=8000"
 
 

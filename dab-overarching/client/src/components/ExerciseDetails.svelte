@@ -1,17 +1,15 @@
 <script>
-  let { exId } = $props();              // comes from the route
+  let { exId } = $props();
 
+  /* fetch meta ------------------------------------------------------------- */
   let exercise = $state(null);
   let loading  = $state(true);
   let error    = $state(null);
 
-  import ExerciseEditor from "./ExerciseEditor.svelte";
-
-  /* ---------- fetch exercise on mount ---------- */
   $effect(async () => {
     try {
       const r = await fetch(`/api/exercises/${exId}`);
-      if (r.status === 404) throw new Error("Not found");
+      if (!r.ok) throw new Error(r.statusText);
       exercise = await r.json();
     } catch (e) {
       error = "Failed to load exercise";
@@ -20,6 +18,8 @@
       loading = false;
     }
   });
+
+  import ExerciseEditor from "./ExerciseEditor.svelte";
 </script>
 
 {#if loading}
@@ -32,6 +32,5 @@
   <h1>{exercise.title}</h1>
   <p>{exercise.description}</p>
 
-  <!-- drop-in editor -->
-  <ExerciseEditor submitLabel="Submit" />
+  <ExerciseEditor exerciseId={exercise.id} client:idle />
 {/if}

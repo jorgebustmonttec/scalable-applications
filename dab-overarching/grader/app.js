@@ -74,8 +74,8 @@ app.use("/*", cors());
 
 // ========================= ROUTES =========================
 
-// ---------- GET /api/status ----------
-app.get("/api/status", async (c) => {
+// ---------- GET /grader-api/status ----------
+app.get("/grader-api/status", async (c) => {
   const queueSize = await redis.llen("submissions");
   return c.json({
     queue_size: queueSize,
@@ -83,8 +83,8 @@ app.get("/api/status", async (c) => {
   });
 });
 
-// ---------- POST /api/consume/enable ----------
-app.post("/api/consume/enable", async (c) => {
+// ---------- POST /grader-api/consume/enable ----------
+app.post("/grader-api/consume/enable", async (c) => {
   if (!consumeEnabled) {
     consumeEnabled = true;
     graderLoop(); // don't await, run async
@@ -93,8 +93,8 @@ app.post("/api/consume/enable", async (c) => {
   return c.json({ consume_enabled: true });
 });
 
-// ---------- POST /api/consume/disable ----------
-app.post("/api/consume/disable", async (c) => {
+// ---------- POST /grader-api/consume/disable ----------
+app.post("/grader-api/consume/disable", async (c) => {
   consumeEnabled = false;
   return c.json({ consume_enabled: false });
 });
