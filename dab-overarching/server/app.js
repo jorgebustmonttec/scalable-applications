@@ -1,4 +1,4 @@
-// ========================= IMPORTS =========================
+// ================================== IMPORTS ==================================
 
 // ------------------------- Hono -------------------------
 import { Hono } from "@hono/hono";
@@ -15,7 +15,7 @@ import { Redis } from "ioredis";
 // ------------------------- auth -------------------------
 import { auth } from "./auth.js";
 
-// ========================= CONFIG =========================
+// ================================== CONFIG ==================================
 
 // ------------------------- Environment Variables -------------------------
 /*
@@ -25,6 +25,15 @@ import { auth } from "./auth.js";
 */
 const app = new Hono();
 const sql = postgres();
+
+const requireAuth = async (c, next) => {
+  const session = await auth.verifyRequest(c.req.raw);
+  if (!session) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  c.set("session", session); // optional if you want access later
+  return next();
+};
 
 // ------------------------- Redis -------------------------
 let redis;
@@ -45,7 +54,7 @@ app.use("/*", logger());
 app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 
 
-// ========================= ROUTES =========================
+// ================================== ROUTES ==================================
 
 // =====---------------===== Health Check =====---------------=====
 
@@ -94,7 +103,7 @@ app.get("/api/exercises/:id", async (c) => {
 // ---------- GET /api/exercises/:id/submissions ----------
 // This endpoint retrieves all submissions for a specific exercise by its ID.
 
-app.post("/api/exercises/:id/submissions", async (c) => {
+app.post("/api/exercises/:id/submissions", requireAuth, async (c) => {
   const id = c.req.param("id");
   const { source_code } = await c.req.json();
 
@@ -183,7 +192,7 @@ app.get("/api/languages/:id/exercises", async (c) => {
 // ---------- GET /api/submissions/:id/status ----------
 // This endpoint retrieves the status of a specific submission by its ID.
 
-app.get("/api/submissions/:id/status", async (c) => {
+app.get("/api/submissions/:id/status", requireAuth, async (c) => {
   const id = c.req.param("id");
 
   const result = await sql`
