@@ -12,6 +12,9 @@ import postgres from "postgres";
 // ------------------------- Redis -------------------------
 import { Redis } from "ioredis";
 
+// ------------------------- auth -------------------------
+import { auth } from "./auth.js";
+
 // ========================= CONFIG =========================
 
 // ------------------------- Environment Variables -------------------------
@@ -37,6 +40,9 @@ if (Deno.env.get("REDIS_HOST")) {
 // ------------------------- Middleware -------------------------
 app.use("/*", cors());
 app.use("/*", logger());
+
+// ------------------------- Auth Middleware -------------------------
+app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 
 
 // ========================= ROUTES =========================
