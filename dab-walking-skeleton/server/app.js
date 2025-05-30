@@ -12,6 +12,10 @@ import postgres from "postgres";
 // ------------------------- Redis -------------------------
 import { Redis } from "ioredis";
 
+// ------------------------- auth -------------------------
+import { auth } from "./auth.js";
+
+
 // ========================= CONFIG =========================
 
 // ------------------------- Hono App -------------------------
@@ -103,6 +107,11 @@ app.use("*", async (c, next) => {
   await next();
 });
 app.use("/public/*", serveStatic({ root: "." }));
+
+
+// ------------------------- Auth -------------------------
+
+app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 
 // ========================= ROUTES =========================
 
