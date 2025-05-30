@@ -71,6 +71,7 @@ services:
       - "traefik.http.routers.server-router.entrypoints=web"
       - "traefik.http.routers.server-router.rule=PathPrefix(`/api`)"
       - "traefik.http.services.server-service.loadbalancer.server.port=8000"
+
   consumer-server:
     build: consumer-server
     restart: unless-stopped
@@ -81,6 +82,13 @@ services:
     depends_on:
       - redis
       - database
+
+  lgtm:
+    image: grafana/otel-lgtm:0.8.6
+    ports:
+      - "3000:3000"
+      - "4318:4318"
+
 
 volumes:
   client_node_modules:

@@ -240,4 +240,11 @@ app.get("/api", (c) => {
   return c.text("Hello new path!");
 });
 
+// ========================= LGTM =========================
+
+app.get("/api/lgtm-test", (c) => {
+  console.log("Hello log collection :)");
+  return c.json({ message: "Hello, world!" });
+});
+
 export default app;
