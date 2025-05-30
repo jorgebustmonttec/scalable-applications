@@ -47,7 +47,7 @@ app.use("/*", logger());
 // This is the root endpoint, which serves as a health check.
 
 app.get(
-  "/",
+  "/api",
   cache({
     cacheName: "hello-cache",
     wait: true,
@@ -55,7 +55,7 @@ app.get(
 );
 
 app.get(
-  "/",
+  "/api",
   async (c) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return c.json({ message: "Hello world!" });
