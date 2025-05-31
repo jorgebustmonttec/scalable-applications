@@ -1,7 +1,7 @@
 <script>
-  let { exId } = $props();
+  let { exId } = $props();               // incoming id
 
-  /* fetch meta ------------------------------------------------------------- */
+  /* fetch exercise -------------------------------------------------------- */
   let exercise = $state(null);
   let loading  = $state(true);
   let error    = $state(null);
@@ -19,6 +19,10 @@
     }
   });
 
+  /* auth info ------------------------------------------------------------- */
+  import { useUserState } from "../states/userState.svelte.js";
+  const user = useUserState();
+
   import ExerciseEditor from "./ExerciseEditor.svelte";
 </script>
 
@@ -32,5 +36,11 @@
   <h1>{exercise.title}</h1>
   <p>{exercise.description}</p>
 
-  <ExerciseEditor exerciseId={exercise.id} client:idle />
+  {#if user.email}
+    <!-- authenticated -> show editor -->
+    <ExerciseEditor exerciseId={exercise.id} client:idle />
+  {:else}
+    <!-- not logged in -->
+    <p>Login or register to complete exercises.</p>
+  {/if}
 {/if}

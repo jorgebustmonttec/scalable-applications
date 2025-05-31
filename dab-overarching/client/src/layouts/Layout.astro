@@ -1,10 +1,15 @@
 ---
+import AuthBar from "../components/auth/AuthBar.svelte";
 const { title = "Overarching" } = Astro.props;
 ---
 
 <html lang="en">
   <head><title>{title}</title></head>
   <body>
+    <!-- user info / links -->
+    <AuthBar client:visible />
+
+    <!-- page content -->
     <slot />
   </body>
 </html>
