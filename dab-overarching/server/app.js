@@ -52,7 +52,7 @@ app.use("/*", cors());
 app.use("/*", logger());
 
 // ------------------------- Auth Middleware -------------------------
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
 
 
 // ================================== ROUTES ==================================
@@ -104,7 +104,24 @@ app.get("/api/exercises/:id", async (c) => {
 // ---------- GET /api/exercises/:id/submissions ----------
 // This endpoint retrieves all submissions for a specific exercise by its ID.
 
-app.post("/api/exercises/:id/submissions", requireAuth, async (c) => {
+app.get("/api/exercises/:id/submissions", requireAuth, async (c) => {
+  const id = c.req.param("id");
+
+  const submissions = await sql`
+    SELECT id, source_code, grading_status, grade
+    FROM exercise_submissions
+    WHERE exercise_id = ${id}
+    ORDER BY id DESC
+  `;
+
+  return c.json(submissions);
+}
+);
+
+// ---------- POST /api/exercises/:id/submissions ----------
+// This endpoint allows users to submit their solutions for a specific exercise by its ID.
+
+app.post("/api/exercises/:id/submissions",  requireAuth, async (c) => {
   const id = c.req.param("id");
   const { source_code } = await c.req.json();
 
@@ -192,6 +209,29 @@ app.get("/api/submissions/:id/status", requireAuth, async (c) => {
 
   return c.json(result[0]);
 });
+
+// ---------- POST /api/submissions/:id/status ----------
+// This endpoint allows users to update the status of a specific submission by its ID.
+
+app.post("/api/submissions/:id/status", requireAuth, async (c) => {
+  const id = c.req.param("id");
+  const { grading_status, grade } = await c.req.json();
+
+  // Update submission status
+  const result = await sql`
+    UPDATE exercise_submissions
+    SET grading_status = ${grading_status}, grade = ${grade}
+    WHERE id = ${id}
+    RETURNING id
+  `;
+
+  if (result.length === 0) {
+    return c.notFound();
+  }
+
+  return c.json({ id: result[0].id });
+}
+);
 
 
 
