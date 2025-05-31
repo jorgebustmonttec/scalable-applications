@@ -27,13 +27,14 @@ const app = new Hono();
 const sql = postgres();
 
 const requireAuth = async (c, next) => {
-  const session = await auth.verifyRequest(c.req.raw);
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {
     return c.json({ error: "Unauthorized" }, 401);
   }
-  c.set("session", session); // optional if you want access later
+  c.set("session", session); // store user info if you want to use it later
   return next();
 };
+
 
 // ------------------------- Redis -------------------------
 let redis;
@@ -51,7 +52,7 @@ app.use("/*", cors());
 app.use("/*", logger());
 
 // ------------------------- Auth Middleware -------------------------
-app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 
 // ================================== ROUTES ==================================
@@ -122,23 +123,7 @@ app.post("/api/exercises/:id/submissions", requireAuth, async (c) => {
   return c.json({ id: submissionId });
 });
 
-// ---------- GET /api/exercises/:id ------------
-// This endpoint retrieves all submissions for a specific exercise by its ID.
-app.get("/api/exercises/:id", async (c) => {
-  const id = c.req.param("id");
 
-  const result = await sql`
-    SELECT id, title, description
-    FROM exercises
-    WHERE id = ${id}
-  `;
-
-  if (result.length === 0) {
-    return c.notFound();
-  }
-
-  return c.json(result[0]);
-});
 
 
 
