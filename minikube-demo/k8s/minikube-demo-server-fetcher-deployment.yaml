@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minikube-demo-server-fetcher-deployment
+  labels:
+    app: minikube-demo-server-fetcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minikube-demo-server-fetcher
+  template:
+    metadata:
+      labels:
+        app: minikube-demo-server-fetcher
+    spec:
+      containers:
+        - name: minikube-demo-server-fetcher
+          image: minikube-demo-server-fetcher:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000

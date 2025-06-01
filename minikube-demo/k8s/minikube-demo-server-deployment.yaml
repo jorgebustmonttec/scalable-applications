@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minikube-demo-server-deployment
+  labels:
+    app: minikube-demo-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: minikube-demo-server
+  template:
+    metadata:
+      labels:
+        app: minikube-demo-server
+    spec:
+      containers:
+        - name: minikube-demo-server
+          image: minikube-demo-server:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000

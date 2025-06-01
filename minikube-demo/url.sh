@@ -1,0 +1,1 @@
+minikube service minikube-demo-server-service --url
