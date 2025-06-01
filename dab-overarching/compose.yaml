@@ -57,6 +57,9 @@ services:
       postgres
       -c shared_preload_libraries=auto_explain,pg_stat_statements
       -c auto_explain.log_min_duration=10
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
 
   database-migrations:
     image: flyway/flyway:10
@@ -106,7 +109,19 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 
+  lgtm:
+    image: grafana/otel-lgtm:0.8.6
+    ports:
+      - "3000:3000"
+      - "4318:4318"
+    volumes:
+      - ./lgtm_data:/var/lib/grafana
+
+
+
 
 volumes:
   client_node_modules:
   client_deno_dir:
+  lgtm-data:
+
