@@ -233,6 +233,17 @@ app.post("/api/submissions/:id/status", requireAuth, async (c) => {
 }
 );
 
+// =====---------------===== Lgtm =====---------------=====
+
+// ---------- GET /api/lgtm-test ----------
+// This endpoint is a test endpoint for logging purposes. It logs a message and returns a JSON response.
+
+app.get("/api/lgtm-test", (c) => {
+  console.log("Hello log collection :)");
+  return c.json({ message: "Hello, world!" });
+});
+
+
 
 
 // ========================= EXPORTS =========================
