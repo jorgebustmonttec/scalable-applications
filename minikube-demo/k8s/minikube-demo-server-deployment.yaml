@@ -5,7 +5,7 @@ metadata:
   labels:
     app: minikube-demo-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: minikube-demo-server
@@ -16,7 +16,19 @@ spec:
     spec:
       containers:
         - name: minikube-demo-server
-          image: minikube-demo-server:1.0
+          image: minikube-demo-server:1.1
           imagePullPolicy: Never
           ports:
             - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: minikube-demo-configmap
+            - secretRef:
+                name: minikube-demo-secret
+          volumeMounts:
+            - name: data-storage
+              mountPath: "/app/data"
+      volumes:
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: minikube-demo-local-persistentvolume-claim

@@ -1,1 +1,1 @@
-kubectl apply -f k8s/minikube-demo-server-deployment.yaml
+kubectl apply -f k8s/
