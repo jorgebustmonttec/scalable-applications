@@ -105,6 +105,13 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
+  lgtm:
+    image: grafana/otel-lgtm:0.8.6
+    ports:
+      - "3000:3000"
+      - "4318:4318"
+    volumes:
+      - ./lgtm_data:/var/lib/grafana
 
 
 volumes:
