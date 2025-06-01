@@ -115,7 +115,8 @@ services:
       - "3000:3000"
       - "4318:4318"
     volumes:
-      - ./lgtm_data:/var/lib/grafana
+      - lgtm-data:/var/lib/grafana
+
 
 
 
@@ -124,4 +125,3 @@ volumes:
   client_node_modules:
   client_deno_dir:
   lgtm-data:
-
