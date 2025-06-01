@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minikube-demo-database-migration-job
+spec:
+  template:
+    metadata:
+      name: minikube-demo-database-migration-job
+    spec:
+      containers:
+        - name: minikube-demo-database-migrations
+          image: minikube-demo-database-migrations:1.0
+          imagePullPolicy: Never
+          env:
+            - name: FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minikube-demo-database-cluster-app
+                  key: username
+                  optional: false
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minikube-demo-database-cluster-app
+                  key: password
+                  optional: false
+      restartPolicy: Never
+  backoffLimit: 2
